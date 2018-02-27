@@ -11,11 +11,11 @@ public class TaskManager {
     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
     private List<Task> list = new ArrayList<>();
-
+    Output output = new Output();
 
     public void mainMenu() {
 
-        Output output = new Output();
+
 
         output.mainOutput();
         String choice = input.nextLine();
@@ -91,7 +91,7 @@ public class TaskManager {
         }
 
         if (i == 1) {
-            System.out.println("You have no completed tasks.");
+            output.noTask();
         }
     } //Views all tasks that have the boolean value "complete" == true
 
@@ -104,28 +104,30 @@ public class TaskManager {
             }
         }
         if (i == 1) {
-            System.out.println("You have no tasks that are incomplete");
+            output.noTask();
         }
     } //Views all tasks that have the boolean value "complete" != true
 
     private void addTaskTitle(Task task) {
-        System.out.println("What is the title of your new task?\n");
+        output.askTitle();
         try {
             String title = input.nextLine();
             task.setTitle(title);
         } catch (Exception e) {
-            System.out.println("Could not process input, please try again.");
+            output.invalidInput();
             addTaskTitle(task);
         }
     } //Used by addTask() to set the Title of the created object
 
     private void addTaskDate(Task task) {
-        System.out.println("Add a due date:\n");
-        System.out.println("What month is your task due? (number 1-12)");
+
+        output.askDate();
         String monthInput = input.nextLine();
-        System.out.println("What day of the month is your task due?");
+
+        output.askDay();
         String dayInput = input.nextLine();
-        System.out.println("What year is your task due?");
+
+        output.askYear();
         String yearInput = input.nextLine();
 
         try {
@@ -137,18 +139,18 @@ public class TaskManager {
             String dateString = ld.format(dateFormat);
             task.setDueDate(dateString);
         } catch (Exception e) {
-            System.out.println("Could not read date format. Please try again.");
+            output.invalidDate();
             addTaskDate(task);
         }
     } //Used by addTask() to set the due date of the created object
 
     private void addTaskDetails(Task task) {
-        System.out.println("Please describe your task.\n");
+        output.askDetails();
         try {
             String details = input.nextLine();
             task.setDetails(details);
         } catch (Exception e) {
-            System.out.println("Could not process input, please try again.");
+            output.invalidInput();
             addTaskDetails(task);
         }
     } //Used by addTask() to set the description of the created object
@@ -164,8 +166,8 @@ public class TaskManager {
         for (Task task : inComplete) {
             System.out.println(i + ". " + task.getTitle());
         }
-        System.out.println("\nWhich task would you like to mark complete?" +
-                "\nEnter a number that appears on the list above.\n");
+
+        output.askIndex();
 
         try {
             String indexString = input.nextLine();
@@ -182,13 +184,15 @@ public class TaskManager {
             }
             System.out.println();
         }catch (Exception e) {
-            System.out.println("Input does not correspond to a number on the list. Returning to Main menu.\n");
+            output.invalidInput();
+            markComplete();
         }
 
     } //Sets boolean value "complete" of an object in the arraylist equal to true
 
     private void edit() {
-        System.out.println("Which entry would you like to edit?");
+
+        output.askIndex();
 
         int i = 1;
         for (Task task : list) {
@@ -200,36 +204,34 @@ public class TaskManager {
         try {
             index = Integer.parseInt(indexString);
         } catch (Exception e) {
-            System.out.println("Input does not match any Task on the list.");
+            output.invalidInput();
             edit();
         }
 
         if (index <= 0 || index >= (list.size() + 1)) {
-            System.out.println("Input does not match any task on the list. Please try again");
+            output.invalidInput();
             edit();
         }
 
         Task edit = list.get(index - 1);
-        System.out.println("What do you want to edit about this entry?" +
-                 "\n1. Title" +
-                 "\n2. Due Date" +
-                 "\n3. Task description" +
-                 "\n4. return to the main menu");
+
+        output.editList();
+
          String editNum = input.nextLine();
 
          switch (editNum) {
              case "1":
-                 System.out.println("What do you want to make your new title?");
+                 output.askTitle();
                  edit.setTitle(input.nextLine());
                  list.set((index - 1), edit);
                  break;
              case "2":
-                 System.out.println("What do you want to make your new due date? Use format MM-DD-YYYY");
+                 output.askDateFormatted();
                  edit.setDueDate(input.nextLine());
                  list.set((index - 1), edit);
                  break;
              case "3":
-                 System.out.println("What do you want to set your task description to?");
+                 output.askDetails();
                  edit.setDetails(input.nextLine());
                  list.set((index - 1), edit);
                  break;
@@ -237,15 +239,16 @@ public class TaskManager {
                  mainMenu();
                  break;
              default:
-                 System.out.println("Could not read input. Please try again.");
+                 output.invalidInput();
                  editAgain(edit, index);
+                 break;
 
          }
     } //Prompts user to overwrite variables of the desired object. (title, due date, description)
 
     private void delete() {
-        System.out.println("Which entry do you want to delete? (number)" +
-                "\nType \"return\" to return to the main menu");
+        output.askIndex();
+        output.cancel();
         int i = 1;
         for (Task task : list) {
             System.out.println(i + ". " + task.getTitle());
@@ -259,13 +262,13 @@ public class TaskManager {
             int index = Integer.parseInt(indexString);
             list.remove(index - 1);
         } catch (Exception e) {
-            System.out.println("Could not match input to number on list. Please try again.");
+            output.invalidInput();
             delete();
         }
     } //Deletes an object from the arraylist
 
     private void details() {
-        System.out.println("Which task do you wish to know more about?");
+        output.askIndex();
 
         int i = 1;
         for (Task task : list) {
@@ -277,33 +280,26 @@ public class TaskManager {
 
         Task details = list.get(index - 1);
 
-        System.out.println("Title: " + details.getTitle() +
-        "\nDue Date: " + details.getDueDate() +
-        "\nDescription: " + details.getDetails() +
-        "\nCompletion Date: " + details.getCompleteDate());
+        output.getDetails(details);
     } //Lists off variable values of an object.
 
     private void editAgain(Task edit, int index) {
-        System.out.println("What do you want to edit about this entry?" +
-                "\n1. Title" +
-                "\n2. Due Date" +
-                "\n3. Task description" +
-                "\n4. return to the main menu");
-        String editNum = input.nextLine();
+       output.editList();
+       String editNum = input.nextLine();
 
         switch (editNum) {
             case "1":
-                System.out.println("What do you want to make your new title?");
+                output.askTitle();
                 edit.setTitle(input.nextLine());
                 list.set((index - 1), edit);
                 break;
             case "2":
-                System.out.println("What do you want to make your new due date? Use format MM-DD-YYYY");
+                output.askDateFormatted();
                 edit.setDueDate(input.nextLine());
                 list.set((index - 1), edit);
                 break;
             case "3":
-                System.out.println("What do you want to set your task description to?");
+                output.askDetails();
                 edit.setDetails(input.nextLine());
                 list.set((index - 1), edit);
                 break;
@@ -311,9 +307,10 @@ public class TaskManager {
                 mainMenu();
                 break;
             default:
-                //System.out.println("Could not read input. Returning to the main menu");
+                output.invalidInput();
+                editAgain(edit, index);
+                break;
         }
     } /*Error handling method. if a user fails to select which variable they want to edit inside of edit(),
     it will ask them again, which variable they want to edit, instead of having them select their object again.*/
-
 }
