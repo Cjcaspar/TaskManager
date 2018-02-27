@@ -4,6 +4,10 @@ import java.text.SimpleDateFormat;
 
 
 public class Task {
+
+    /** Naming convention, should be isComplete, as is customary. */
+
+
     private String title;
     private String dueDate;
     private String details;

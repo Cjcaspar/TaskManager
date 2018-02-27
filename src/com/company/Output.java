@@ -1,6 +1,9 @@
 package com.company;
 
 public class Output {
+
+    /**Since none of these methods require actual object instantiation (because the values won't be changing), these should be static methods. */
+
     public void mainOutput() {
         System.out.println("What would you like to do? " +
                 "\n1. add task " +

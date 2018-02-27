@@ -10,7 +10,12 @@ public class TaskManager {
     Scanner input = new Scanner(System.in); //Scanner instantiation
     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
+    /** Make the list name more verbose so that it's better-understood what this is a list of. */
     private List<Task> list = new ArrayList<>();
+
+    /** I'd make Output an OutputUtil class and make all of the methods static (static isn't always bad, only whenever there are
+     * static member variables in-relation to an object. If the static use is just independent of object creation, such as a method that
+     * returns a string, it could/should be static). This will help you avoid object instantiations. */
     Output output = new Output();
 
     public void mainMenu() {
@@ -62,6 +67,11 @@ public class TaskManager {
         }
 
     } //Asks user what they would like to do.
+
+    /** Rather than passing the same task in over and over again to various methods, it'd be better to make
+     * methods that return Strings (for string values) and have scanners inside.
+     * Then you could be all : Task task = new Task(getTaskTitle(), getDueDate(), getDetails());
+     * taskList.add(task);. This would make your code much, much more readable.*/
 
     private void addTask(List<Task> task) {
         Task newTask = new Task(" ", " ", " ", false, " ");
@@ -157,6 +167,10 @@ public class TaskManager {
 
     private void markComplete() {
         List<Task> inComplete = new ArrayList<>();
+
+        /** This is a very heavy method, with multiple loops. A better approach would maybe be, upon Task creation, to put a task
+         * in a list automatically for incompleted tasks. Then, whenever the user completes it, removing it from the list. */
+
         for (Task task : list) {
             if (!task.isComplete()) {
                 inComplete.add(task);
@@ -191,6 +205,10 @@ public class TaskManager {
     } //Sets boolean value "complete" of an object in the arraylist equal to true
 
     private void edit() {
+
+        /** Rather than performing heavy tasks like this, I'd simply pass the Task into the edit() method and
+         * change its values based on what the user wishes to change. Use a for-loop to add numbers next to your tasks, then, when they pick a number
+         * you could be all: edit(taskList.get(input - 1)) and it'd grab access to the proper task object for editing. */
 
         output.askIndex();
 
@@ -247,6 +265,8 @@ public class TaskManager {
     } //Prompts user to overwrite variables of the desired object. (title, due date, description)
 
     private void delete() {
+        /**See edit() comment. */
+
         output.askIndex();
         output.cancel();
         int i = 1;
@@ -268,6 +288,8 @@ public class TaskManager {
     } //Deletes an object from the arraylist
 
     private void details() {
+        /** See edit comment */
+
         output.askIndex();
 
         int i = 1;
